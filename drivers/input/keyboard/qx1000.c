@@ -141,6 +141,7 @@
 #define KF_CTRL			0x4000
 #define KF_ALT			0x2000
 #define KF_FN			0x1000	/* Not used in key array */
+#define KF_META			0x0800
 
 #define KEY_FLAGS(key) ((key) & 0xf000)
 #define KEY_VALUE(key) ((key) & 0x0fff)
@@ -1159,6 +1160,11 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 		keycode = KEY_LEFTSHIFT;
 		report = true;
 	}
+	if (button->code == KEY_LEFTMETA || button->code == KEY_RIGHTMETA) {
+		mask = KF_META;
+		keycode = KEY_LEFTMETA;
+		report = true;
+	}
 	if (keycode == KEY_RESERVED) {
 		dev_err(input->dev.parent, "unhandled code %u\n", button->code);
 		return;
@@ -1566,6 +1572,7 @@ static int gpio_keys_probe(struct platform_device *pdev)
 	input_set_capability(input, EV_KEY, KEY_LEFTSHIFT);
 	input_set_capability(input, EV_KEY, KEY_LEFTCTRL);
 	input_set_capability(input, EV_KEY, KEY_LEFTALT);
+	input_set_capability(input, EV_KEY, KEY_LEFTMETA);
 
 	error = input_register_device(input);
 	if (error) {
